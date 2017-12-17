@@ -1,0 +1,10 @@
+BuildPath.txt
+.project
+[BP External Sources]
+*.o
+*.fst
+*.cf
+*.vcd
+*
+!/**/
+!*.*

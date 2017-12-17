@@ -1,0 +1,1 @@
+../vga_sync_gen/vga_sync_gen.vhdl
