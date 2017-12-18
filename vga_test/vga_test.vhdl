@@ -28,37 +28,48 @@ architecture rtl of vga_test is
 	signal w_Pos_X : integer;
 	signal w_Pos_Y : integer;
     
+	signal w_HSync_End : std_logic;
+
+
 	signal w_red : std_logic := '0';
 	signal w_grn : std_logic := '0';
 	signal w_blu : std_logic := '0';
 
 begin
-	VGA_Sync_Gen_inst : entity work.VGA_Sync_Gen
-	--generic map (
-		--g_H_Active_Count => 800,
-		--g_H_Sync_Count => 64,
-		--g_H_Back_Count => 152,
-		--g_H_Border_Count => 0,
-		--g_H_Front_Count => 32,
-		
-		--g_V_Active_Count => 600,
-		--g_V_Sync_Count => 3,
-		--g_V_Back_Count => 27,
-		--g_V_Border_Count => 0,
-		--g_V_Front_Count => 1
-	
-	--)
+	e_HSync : entity work.VGA_Sync_Gen
+	generic map (
+		g_Active_Count => 640,
+		g_Sync_Count => 96,
+		g_Back_Count => 48,
+		g_Border_Count => 0,
+		g_Front_Count => 16
+	)
 	port map (
-	
         i_Clk => i_Clk,
+		i_Count_Clk => i_Clk,
         i_Active => '1',
-        o_HSync => w_HSync,
-        o_VSync => w_VSync,
-        o_H_Video_Active => w_H_Video_Active,
-        o_V_Video_Active => w_V_Video_Active,
-        o_Pos_X => w_Pos_X,
-        o_Pos_Y => w_Pos_Y
-	);    
+        o_Sync => w_HSync,
+		o_Video_Active => w_H_Video_Active,
+		o_Pos => w_Pos_X,
+		o_Sync_End => w_HSync_End
+	);
+		
+	e_VSync : entity work.VGA_Sync_Gen
+	generic map (
+		g_Active_Count => 480,
+		g_Sync_Count => 2,
+		g_Back_Count => 33,
+		g_Border_Count => 0,
+		g_Front_Count => 10
+	)
+	port map (
+        i_Clk => i_Clk,
+		i_Count_Clk => w_HSync_End,
+        i_Active => '1',
+        o_Sync => w_VSync,
+		o_Video_Active => w_V_Video_Active,
+		o_Pos => w_Pos_Y
+	);
 	
 	p_draw : process(i_Clk) 
   	begin
@@ -74,6 +85,11 @@ begin
 			w_blu <= '0';
 		end if;
 			
+		if (w_Pos_Y = 0 OR w_Pos_Y = 479) OR (w_Pos_x = 0 OR w_Pos_x = 639) then
+			w_grn <= '1';
+		else
+			w_grn <= '0';
+		end if;
 		
 	end process p_draw;
 	

@@ -13,44 +13,57 @@ architecture behave of VGA_Sync_Gen_tb is
 	signal r_CLOCK : std_logic := '0';
 	signal r_ACTIVE : std_logic := '1';
 	
-	signal w_HSYNC : std_logic;
-	signal w_VSYNC : std_logic;
+	signal w_HSync : std_logic;
+	signal w_VSync : std_logic;
 	
 	signal w_H_Video_Active : std_logic;
 	signal w_V_Video_Active : std_logic;
 	
 	signal w_Pos_X : integer;
 	signal w_Pos_Y : integer;
+	
+	signal w_HSync_End : std_logic;
+
 
 	shared variable r_ENDSIM : boolean := false;
 begin
 
 	-- Instantiate the UUT
-	UUT : entity work.VGA_Sync_Gen
-	--generic map (
-		--g_H_Active_Count => 10,
-		--g_H_Sync_Count => 5,
-		--g_H_Back_Count => 6,
-		--g_H_Border_Count => 2,
-		--g_H_Front_Count => 7,
-		
-		--g_V_Active_Count => 10,
-		--g_V_Sync_Count => 5,
-		--g_V_Back_Count => 6,
-		--g_V_Border_Count => 2,
-		--g_V_Front_Count => 7
-	
-	--)
+	HSync : entity work.VGA_Sync_Gen
+	generic map (
+		g_Active_Count => 640,
+		g_Sync_Count => 96,
+		g_Back_Count => 48,
+		g_Border_Count => 0,
+		g_Front_Count => 16
+	)
 	port map (
 	
         i_Clk => r_CLOCK,
+		i_Count_Clk => r_CLOCK,
         i_Active => r_ACTIVE,
-        o_HSync => w_HSYNC,
-        o_VSync => w_VSYNC,
-		o_H_Video_Active => w_H_Video_Active,
-		o_V_Video_Active => w_V_Video_Active,
-		o_Pos_X => w_Pos_X,
-		o_Pos_Y => w_Pos_Y
+        o_Sync => w_HSync,
+		o_Video_Active => w_H_Video_Active,
+		o_Pos => w_Pos_X,
+		o_Sync_End => w_HSync_End
+	);
+		
+	VSync : entity work.VGA_Sync_Gen
+	generic map (
+		g_Active_Count => 480,
+		g_Sync_Count => 2,
+		g_Back_Count => 33,
+		g_Border_Count => 0,
+		g_Front_Count => 10
+	)
+	port map (
+	
+        i_Clk => i_Clk,
+		i_Count_Clk => w_HSync_End,
+        i_Active => r_ACTIVE,
+        o_Sync => w_VSync,
+		o_Video_Active => w_V_Video_Active,
+		o_Pos => w_Pos_Y
 	);
 
 	p_CLK_GEN : process is
