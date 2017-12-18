@@ -72,9 +72,7 @@ begin
         		
         	end if;
         else
-        	-- r_SM_HSync <= s_Idle;
         	r_H_Count <= 0;
-        	--r_H_Video_Active <= '0';
         end if;
 	end process p_VGA_HCount;
 
@@ -176,13 +174,6 @@ begin
 			end if;
 		end if;
 	end process p_VGA_Pos;
-	
-	--p_VGA_Reset_Y : process (r_V_Video_Active)
-	--begin
-	--	if rising_edge(r_V_Video_Active) then
-	--		r_Pos_Y <= 0;
-	--	end if;
-	--end process p_VGA_Reset_Y;
 
     
     o_HSync <= r_HSync and i_Active;
@@ -193,12 +184,5 @@ begin
 	
     o_Pos_X <= r_Pos_X;
     o_Pos_Y <= r_Pos_Y;
-	-- Create a signal for simulation purposes (allows waveform display)
-	--w_SM_Main <= "000" when r_SM_Main = s_Idle else
-	--						 "001" when r_SM_Main = s_TX_Start_Bit else
-	--						 "010" when r_SM_Main = s_TX_Data_Bits else
-	--						 "011" when r_SM_Main = s_TX_Stop_Bit else
-	--						 "100" when r_SM_Main = s_Cleanup else
-	--						 "101"; -- should never get here
 	
 end RTL;
